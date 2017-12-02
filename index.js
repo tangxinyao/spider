@@ -20,12 +20,12 @@ function fetchData() {
         encoding: null
     }, function (err, res, body) {
         const $ = cheerio.load(body);
-        const list = $('.lecture').map((i, lecture) => {
+        const list = $('.lecture').each((i, lecture) => {
             const dirname = path.resolve(__dirname, 'files', 'lecture_' + i);
             if (!fs.existsSync(dirname)) {
                 fs.mkdirSync(dirname);
             }
-            const data = $(lecture).find('a').each((j, datum) => {
+            $(lecture).find('a').each((j, datum) => {
                 const href = $(datum).attr('href');
                 const temp = /.*\/(.*)$/.exec(href);
                 const filename = (temp ? temp[1] : href).split('?')[0];
