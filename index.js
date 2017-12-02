@@ -16,7 +16,8 @@ function fetchData() {
             "Referer": "http://nil.csail.mit.edu/6.824/2015/general.html",
             "Upgrade-Insecure-Requests": "1",
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.89 Safari/537.36"
-        }
+        },
+        encoding: null
     }, function (err, res, body) {
         const $ = cheerio.load(body);
         const list = $('.lecture').map((i, lecture) => {
@@ -24,21 +25,22 @@ function fetchData() {
             if (!fs.existsSync(dirname)) {
                 fs.mkdirSync(dirname);
             }
-            const data = $(lecture).find('a').map((j, datum) => {
+            const data = $(lecture).find('a').each((j, datum) => {
                 const href = $(datum).attr('href');
                 const temp = /.*\/(.*)$/.exec(href);
                 const filename = (temp ? temp[1] : href).split('?')[0];
                 const uri = /^http/.test(href) ? href : 'http://nil.csail.mit.edu/6.824/2015/' + href;
                 request(uri, function (err, res, body) {
                     if (err || res.statusCode !== 200) {
-                        console.log(`error: fetch ${dirname} with ${url}`);
+                        console.log(`error: fetch ${dirname} with ${uri}`);
+                        return;
                     }
-                    if (res.headers['content-type'] === 'application/pdf') {
+                    if (res.headers &&res.headers['content-type'] === 'application/pdf') {
                         // TODO: handle the pdf.
                     }
                     fs.writeFile(path.resolve(dirname, filename), body, function (err) {
                         if (err) {
-                            console.log(dirname + ' with ' + url);
+                            console.log(dirname + ' with ' + uri);
                         }
                     });
                 });
