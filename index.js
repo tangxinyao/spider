@@ -5,7 +5,7 @@ const path = require('path');
 
 function fetchData() {
     request({
-        url: 'http://nil.csail.mit.edu/6.824/2015/schedule.html',
+        url: 'http://nil.csail.mit.edu/6.824/2017/schedule.html',
         encoding: null
     }, function (err, res, body) {
         const $ = cheerio.load(body);
@@ -23,7 +23,7 @@ function fetchData() {
                 if (suffix === 'pdf') {
                     options.headers = { 'Content-type': 'application/pdf' };
                 }
-                const url = /^http/.test(href) ? href : 'http://nil.csail.mit.edu/6.824/2015/' + href;
+                const url = /^http/.test(href) ? href : 'http://nil.csail.mit.edu/6.824/2017/' + href;
                 options.url = url;
                 options.encoding = null;
                 request(options, function (err, res, body) {
@@ -33,7 +33,7 @@ function fetchData() {
                     }
                     fs.writeFile(path.resolve(dirname, filename), body, function (err) {
                         if (err) {
-                            console.log(dirname + ' with ' + url);
+                            console.log(`error: write ${dirname} with ${url}`);
                         }
                     });
                 });
